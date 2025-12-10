@@ -14,8 +14,8 @@ let currentTrackIndex = 0;
 let fadeInterval: any = null;
 
 // Volume Configuration
-const MUSIC_VOLUME = 0.3; // Increased to 30% so it is audible
-const SFX_VOLUME = 0.25;  // Slightly increased SFX
+const MUSIC_VOLUME = 0.4; // Increased to 40% so it's clearly audible
+const SFX_VOLUME = 0.2;   // Slightly louder SFX
 
 const initAudioContext = () => {
     if (!audioCtx) {
@@ -86,13 +86,14 @@ export const SoundManager = {
                     let currentVol = 0;
                     musicAudio!.volume = 0;
 
+                    // Faster fade-in (20ms steps instead of 50ms)
                     fadeInterval = setInterval(() => {
                         if (!musicAudio) {
                              clearInterval(fadeInterval);
                              return;
                         }
                         
-                        currentVol += 0.02; // Faster fade in
+                        currentVol += 0.02; // Faster volume increase
                         if (currentVol >= MUSIC_VOLUME) {
                             currentVol = MUSIC_VOLUME;
                             musicAudio.volume = currentVol;
@@ -100,7 +101,7 @@ export const SoundManager = {
                         } else {
                             musicAudio.volume = currentVol;
                         }
-                    }, 50); 
+                    }, 20); 
                 }).catch(e => {
                     console.log("Music autoplay blocked, waiting for interaction.", e);
                 });

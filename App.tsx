@@ -39,11 +39,18 @@ function App() {
     trackEvent('app_loaded');
     SoundManager.init();
 
-    // Attempt to play music on the very first interaction anywhere on the page
+    // 1. Пытаемся запустить музыку СРАЗУ (работает, если браузер разрешает или пользователь перезагрузил страницу)
+    if (!isMuted) {
+        SoundManager.playMusic();
+    }
+
+    // 2. Fallback: Если браузер заблокировал автозапуск, музыка начнет играть при ПЕРВОМ клике/нажатии
     const startAudio = () => {
+      // Проверяем глобальный стейт через SoundManager, т.к. замыкание useEffect хранит старое значение
       if (!isMuted) {
           SoundManager.playMusic();
       }
+      // Убираем слушатели после первой попытки взаимодействия
       window.removeEventListener('click', startAudio);
       window.removeEventListener('keydown', startAudio);
     };
@@ -55,7 +62,7 @@ function App() {
       window.removeEventListener('click', startAudio);
       window.removeEventListener('keydown', startAudio);
     };
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const handleToggleSound = (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -67,6 +74,7 @@ function App() {
   const handleIntroComplete = () => {
     localStorage.setItem('hm_intro_seen', 'true');
     setShowIntro(false);
+    // Ensure music continues or starts if it wasn't playing
     if (!isMuted) SoundManager.playMusic();
   };
 
@@ -172,22 +180,22 @@ function App() {
     return <IntroVideo onComplete={handleIntroComplete} />;
   }
 
-  // Common Sound Toggle Button
-  const SoundToggle = (
+  // Header Controls (Sound ONLY)
+  const HeaderControls = (
       <button 
         onClick={handleToggleSound}
         className="fixed top-4 right-4 z-50 p-3 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-gray-800 transition-all shadow-lg ring-1 ring-white/30"
         title={isMuted ? "Включить звук" : "Выключить звук"}
       >
-          {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+          {isMuted ? <VolumeX size={24} className="text-gray-800" /> : <Volume2 size={24} className="text-gray-800" />}
       </button>
   );
 
-  // Intro Screen
+  // Intro Screen content
   if (screen === 'intro') {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden">
-        {SoundToggle}
+        {HeaderControls}
         {/* Background blobs */}
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-indigo-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse"></div>
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-emerald-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse delay-75"></div>
@@ -227,7 +235,8 @@ function App() {
 
   return (
     <>
-      {SoundToggle}
+      {HeaderControls}
+      
       {screen === 'character' && <CharacterCreation onComplete={handleCharacterComplete} />}
       
       {screen === 'map' && player && (
