@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { SkipForward } from 'lucide-react';
 
@@ -27,6 +28,7 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ onComplete }) => {
         - muted: required for autoplay in most browsers
         - playsInline: required for iOS
         - onEnded: triggers transition when video finishes
+        - onError: skips video if it fails to load
       */}
         <video
   ref={videoRef}
@@ -38,6 +40,10 @@ const IntroVideo: React.FC<IntroVideoProps> = ({ onComplete }) => {
   autoPlay
   onCanPlay={() => videoRef.current?.play()}
   onEnded={onComplete}
+  onError={() => {
+      console.warn("Video failed to load, skipping intro.");
+      onComplete();
+  }}
 />
     
 

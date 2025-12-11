@@ -29,10 +29,8 @@ function App() {
   const [startTime, setStartTime] = useState<number>(0);
   const [gameHistory, setGameHistory] = useState<Record<string, string[]>>({});
 
-  // Intro state - checking localStorage
-  const [showIntro, setShowIntro] = useState<boolean>(() => {
-    return !localStorage.getItem('hm_intro_seen');
-  });
+  // Intro state - Default to true to show intro on every reload
+  const [showIntro, setShowIntro] = useState<boolean>(true);
 
   // Track initial page load and setup global audio listener
   useEffect(() => {
@@ -72,7 +70,7 @@ function App() {
   };
 
   const handleIntroComplete = () => {
-    localStorage.setItem('hm_intro_seen', 'true');
+    // localStorage.setItem('hm_intro_seen', 'true'); // Removed persistence so intro shows every time
     setShowIntro(false);
     // Ensure music continues or starts if it wasn't playing
     if (!isMuted) SoundManager.playMusic();
@@ -174,6 +172,7 @@ function App() {
     setGameHistory({});
     setStartTime(Date.now());
     setScreen('character');
+    setShowIntro(false); // Don't show video on restart, just title screen
   };
 
   if (showIntro) {
