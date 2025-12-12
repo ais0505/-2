@@ -102,4 +102,4 @@ export const clearAnalyticsData = () => {
 
 // Functions to keep compatibility if imported elsewhere, but they don't do anything now
 export const getAnalyticsUrl = () => GOOGLE_SCRIPT_URL;
-export const setAnalyticsUrl = (url: string) => {}; 
+export const setAnalyticsUrl = (_url: string) => {};

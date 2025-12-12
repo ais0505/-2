@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Region, ArtifactReward, Answer } from '../types';
+import { Region as _Region, ArtifactReward, Answer } from '../types';
 import { REGIONS } from '../constants';
 import { ArrowLeft, MessageCircle, Heart, Brain, Shield, Coins, Anchor, Play } from 'lucide-react';
 import { SoundManager } from '../utils/sound';

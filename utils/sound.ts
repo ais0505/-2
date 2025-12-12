@@ -164,15 +164,17 @@ export const SoundManager = {
     },
 
     playHover: () => {
-        if (isMutedGlobal) return;
-        initAudioContext();
-        if (!audioCtx) return;
+    if (isMutedGlobal) return;
+    initAudioContext();
+    if (!audioCtx) return;
 
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+    const ctx = audioCtx; // гарантируем, что не null
 
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
 
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(800, audioCtx.currentTime);
