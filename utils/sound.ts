@@ -135,33 +135,35 @@ export const SoundManager = {
         osc.stop(audioCtx.currentTime + 0.1);
     },
 
-    playSuccess: () => {
-        if (isMutedGlobal) return;
-        initAudioContext();
-        if (!audioCtx) return;
+   playSuccess: () => {
+    if (isMutedGlobal) return;
+    initAudioContext();
+    if (!audioCtx) return;
 
-        const now = audioCtx.currentTime;
-        const notes = [523.25, 659.25, 783.99]; // C Major
+    const ctx = audioCtx;
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99];
 
-        notes.forEach((freq, i) => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.type = 'triangle'; // Triangle wave for softer but distinct tone
-            osc.frequency.value = freq;
-            
-            const startTime = now + (i * 0.1);
-            gain.gain.setValueAtTime(0, startTime);
-            gain.gain.linearRampToValueAtTime(SFX_VOLUME, startTime + 0.05);
-            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.6);
-            
-            osc.start(startTime);
-            osc.stop(startTime + 0.7);
-        });
-    },
+    notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+
+        const startTime = now + (i * 0.1);
+
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(SFX_VOLUME, startTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.6);
+
+        osc.start(startTime);
+        osc.stop(startTime + 0.7);
+    });
+},
 
     playHover: () => {
     if (isMutedGlobal) return;
