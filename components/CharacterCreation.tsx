@@ -6,7 +6,7 @@ import * as Lucide from 'lucide-react';
 import { AVATARS } from '../constants';
 import { SoundManager } from '../utils/sound';
 
-// Безопасное извлечение иконок для предотвращения ошибок TS2305
+// Безопасное извлечение иконок для предотвращения ошибок TS2305 при сборке
 const Mars = (Lucide as any).Mars || User;
 const Venus = (Lucide as any).Venus || User;
 
