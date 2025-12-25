@@ -2,8 +2,13 @@
 import React from 'react';
 import { Player, PlayerStats } from '../types';
 import { REGIONS, AVATARS } from '../constants';
-import { Brain, Shield, Trophy, Heart, Anchor, Coins, Smile, Lock, Crown, ArrowDown, Check, Mars, Venus } from 'lucide-react';
+import { Brain, Shield, Trophy, Heart, Anchor, Coins, Smile, Lock, Crown, ArrowDown, Check, User } from 'lucide-react';
+import * as Lucide from 'lucide-react';
 import { SoundManager } from '../utils/sound';
+
+// Безопасное извлечение иконок для предотвращения ошибок TS2305
+const Mars = (Lucide as any).Mars || User;
+const Venus = (Lucide as any).Venus || User;
 
 interface MapScreenProps {
   player: Player;

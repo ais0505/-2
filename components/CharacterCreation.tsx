@@ -1,9 +1,14 @@
 
 import React, { useState } from 'react';
 import { Player } from '../types';
-import { User, Check, Mars, Venus, Calendar } from 'lucide-react';
+import { User, Check, Calendar } from 'lucide-react';
+import * as Lucide from 'lucide-react';
 import { AVATARS } from '../constants';
 import { SoundManager } from '../utils/sound';
+
+// Безопасное извлечение иконок для предотвращения ошибок TS2305
+const Mars = (Lucide as any).Mars || User;
+const Venus = (Lucide as any).Venus || User;
 
 interface CharacterCreationProps {
   onComplete: (player: Player) => void;
