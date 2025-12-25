@@ -39,7 +39,7 @@ export const SoundManager = {
             musicAudio.crossOrigin = "anonymous";
             
             // Обработка ошибок загрузки
-            musicAudio.addEventListener('error', (e) => {
+            musicAudio.addEventListener('error', () => {
                 console.warn("Primary music failed, trying backup source...");
                 if (musicAudio) {
                     musicAudio.src = CALM_BACKUP;
@@ -74,7 +74,7 @@ export const SoundManager = {
         // Попытка запуска
         const playPromise = musicAudio.play();
         if (playPromise !== undefined) {
-            playPromise.catch((err) => {
+            playPromise.catch(() => {
                 console.debug("Autoplay blocked. User must click on the page first.");
                 // При следующей попытке (через клик в App.tsx) музыка запустится
             });
