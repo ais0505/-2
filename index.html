@@ -1,20 +1,61 @@
+
 <!DOCTYPE html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Карта Человечества</title>
-    <!-- We keep Tailwind CDN for simplicity in this setup, 
-         but normally this would also be an NPM dependency in a full build -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+      
+      :root {
+        --bg-deep: #020617;
+      }
+
       body {
         font-family: 'Nunito', sans-serif;
-        background-color: #f8fafc;
-        background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-        background-size: 24px 24px;
-        color: #1e293b;
+        background-color: var(--bg-deep);
+        color: #f8fafc;
+        margin: 0;
+        overflow-x: hidden;
+      }
+
+      /* Анимированный эфирный фон */
+      .ethereal-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #020617 100%);
+      }
+
+      .star {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: float 20s infinite linear;
+      }
+
+      @keyframes float {
+        from { transform: translateY(0) translateX(0); }
+        to { transform: translateY(-100vh) translateX(20px); }
+      }
+
+      /* Стеклянные панели */
+      .glass {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .glass-hover:hover {
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.2);
       }
     </style>
   <script type="importmap">
@@ -32,7 +73,24 @@
 </script>
 </head>
   <body>
+    <div class="ethereal-bg" id="stars-container"></div>
     <div id="root"></div>
+    <script>
+      // Генерация звезд для атмосферы
+      const container = document.getElementById('stars-container');
+      for (let i = 0; i < 50; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 3;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 20 + 's';
+        star.style.animationDuration = (Math.random() * 10 + 20) + 's';
+        container.appendChild(star);
+      }
+    </script>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>

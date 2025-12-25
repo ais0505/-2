@@ -1,59 +1,56 @@
 
-// Audio Utility using Web Audio API for SFX and HTML5 Audio for Music
+// Audio Utility - High Reliability Calm System
 
-// Playlist of Ambient/Lo-Fi/Chill tracks (Reliable Sources)
-const PLAYLIST = [
-    // Track 1: Soft Piano & Ambience
-    'https://mp3tornado.net/getmp3/MC9MVEl3TURFM01qQTRPRFZmTmpRM01qQTRPRFZmT0RnMU5qTTVNV05sWXpBMllqQmpOelEwWHprM09HSmlOREptTVdOaU16WXlZbUkzTlM4OElYd2hQbHNpWjNNaUxEQXNJa1FyVUdWeVpYb2lMREVzYm5Wc2JDd3dMRFV3TERCZC9UcmlzdGFuK0QuK1BlcmV6Ky0rTGl0dGxlcm9vdCtUb3duXyhtcDN0b3JuYWRvLm5ldCkvVHJpc3RhbitELitQZXJleislRTIlODAlOTMrTGl0dGxlcm9vdCtUb3duXyhtcDN0b3JuYWRvLm5ldCk/cz12ayZyPSZjb29raWVzPTc5MDY2MTAyMzY3XzEuY29va2ll', 
-];
+// Используем проверенный источник с высокой доступностью (Royalty Free Calm Music)
+const MUSIC_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'; // Стабильный инструментальный трек
+// Альтернативный очень спокойный вариант:
+const CALM_BACKUP = 'https://cdn.pixabay.com/download/audio/2024/10/28/audio_90a46348a8.mp3?filename=friendly-town-fun-video-game-music-loop-256055.mp3'; 
 
 let audioCtx: AudioContext | null = null;
 let musicAudio: HTMLAudioElement | null = null;
 let isMutedGlobal = false;
-let currentTrackIndex = 0;
-let fadeInterval: any = null;
 
-// Volume Configuration
-const MUSIC_VOLUME = 0.4; // Increased to 40% so it's clearly audible
-const SFX_VOLUME = 0.2;   // Slightly louder SFX
+const MUSIC_VOLUME = 0.15; 
+const SFX_VOLUME = 0.12;   
 
 const initAudioContext = () => {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+    try {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    } catch (e) {
+        console.error("AudioContext init failed", e);
     }
 };
 
 export const SoundManager = {
     init: () => {
+        if (typeof window === 'undefined') return;
+        
         if (!musicAudio) {
             musicAudio = new Audio();
-            musicAudio.volume = 0; // Start silent for fade-in
+            musicAudio.src = MUSIC_URL;
+            musicAudio.volume = MUSIC_VOLUME;
+            musicAudio.loop = true;
+            musicAudio.preload = "auto";
+            musicAudio.crossOrigin = "anonymous";
             
-            // Event listener for playlist rotation
-            musicAudio.addEventListener('ended', SoundManager.playNextTrack);
-            
-            // Set initial track
-            currentTrackIndex = 0;
-            musicAudio.src = PLAYLIST[currentTrackIndex];
-            musicAudio.load();
-        }
-    },
-
-    playNextTrack: () => {
-        if (!musicAudio) return;
-        
-        currentTrackIndex = (currentTrackIndex + 1) % PLAYLIST.length;
-        musicAudio.src = PLAYLIST[currentTrackIndex];
-        
-        const playPromise = musicAudio.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(e => {
-                console.log("Auto-advance track blocked (usually fine if user active):", e);
+            // Обработка ошибок загрузки
+            musicAudio.addEventListener('error', (e) => {
+                console.warn("Primary music failed, trying backup source...");
+                if (musicAudio) {
+                    musicAudio.src = CALM_BACKUP;
+                    musicAudio.load();
+                    if (!isMutedGlobal) {
+                        musicAudio.play().catch(() => console.log("Backup also blocked"));
+                    }
+                }
             });
         }
+        initAudioContext();
     },
 
     toggleMute: (mute: boolean) => {
@@ -61,131 +58,100 @@ export const SoundManager = {
         if (musicAudio) {
             musicAudio.muted = mute;
             if (!mute) {
-                // If unmuted, check if playing. If paused, resume.
-                if (musicAudio.paused) {
-                    SoundManager.playMusic();
-                } else {
-                    musicAudio.volume = MUSIC_VOLUME;
-                }
+                SoundManager.playMusic();
+            } else {
+                musicAudio.pause();
             }
         }
     },
 
     playMusic: () => {
-        if (musicAudio && !isMutedGlobal) {
-            // Prevent restarting if already playing
-            if (!musicAudio.paused) return;
-
-            const playPromise = musicAudio.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    // Fade In Logic
-                    if (fadeInterval) clearInterval(fadeInterval);
-                    
-                    let currentVol = 0;
-                    musicAudio!.volume = 0;
-
-                    // Faster fade-in (20ms steps instead of 50ms)
-                    fadeInterval = setInterval(() => {
-                        if (!musicAudio) {
-                             clearInterval(fadeInterval);
-                             return;
-                        }
-                        
-                        currentVol += 0.02; // Faster volume increase
-                        if (currentVol >= MUSIC_VOLUME) {
-                            currentVol = MUSIC_VOLUME;
-                            musicAudio.volume = currentVol;
-                            clearInterval(fadeInterval);
-                        } else {
-                            musicAudio.volume = currentVol;
-                        }
-                    }, 20); 
-                }).catch(e => {
-                    console.log("Music autoplay blocked, waiting for interaction.", e);
-                });
-            }
+        SoundManager.init();
+        initAudioContext();
+        
+        if (!musicAudio || isMutedGlobal) return;
+        
+        // Попытка запуска
+        const playPromise = musicAudio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch((err) => {
+                console.debug("Autoplay blocked. User must click on the page first.");
+                // При следующей попытке (через клик в App.tsx) музыка запустится
+            });
         }
     },
 
-    // --- SFX Section (Web Audio API) ---
+    // Метод для принудительного запуска после жеста пользователя
+    resumeAndPlay: () => {
+        initAudioContext();
+        if (musicAudio && !isMutedGlobal && musicAudio.paused) {
+            musicAudio.play().catch(e => console.error("Final play attempt failed", e));
+        }
+    },
 
     playClick: () => {
         if (isMutedGlobal) return;
         initAudioContext();
         if (!audioCtx) return;
 
+        const now = audioCtx.currentTime;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-
+        
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-
-        // Sine wave for clean "UI" click
+        
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-
-        // Volume Envelope
-        gain.gain.setValueAtTime(SFX_VOLUME, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.1);
+        
+        gain.gain.setValueAtTime(SFX_VOLUME, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+        
+        osc.start(now);
+        osc.stop(now + 0.1);
     },
 
-   playSuccess: () => {
-    if (isMutedGlobal) return;
-    initAudioContext();
-    if (!audioCtx) return;
-
-    const ctx = audioCtx;
-    const now = ctx.currentTime;
-    const notes = [523.25, 659.25, 783.99];
-
-    notes.forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.type = 'triangle';
-        osc.frequency.value = freq;
-
-        const startTime = now + (i * 0.1);
-
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(SFX_VOLUME, startTime + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.6);
-
-        osc.start(startTime);
-        osc.stop(startTime + 0.7);
-    });
-},
+    playSuccess: () => {
+        if (isMutedGlobal) return;
+        initAudioContext();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        [523.25, 659.25, 783.99].forEach((f, i) => {
+            const osc = audioCtx!.createOscillator();
+            const g = audioCtx!.createGain();
+            osc.connect(g);
+            g.connect(audioCtx!.destination);
+            osc.type = 'sine';
+            osc.frequency.value = f;
+            g.gain.setValueAtTime(0, now + i*0.1);
+            g.gain.linearRampToValueAtTime(SFX_VOLUME * 0.4, now + i*0.1 + 0.05);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.1 + 0.8);
+            osc.start(now + i*0.1);
+            osc.stop(now + i*0.1 + 0.9);
+        });
+    },
 
     playHover: () => {
-    if (isMutedGlobal) return;
-    initAudioContext();
-    if (!audioCtx) return;
-
-    const ctx = audioCtx; // гарантируем, что не null
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-
-        // Very short, very quiet
-        gain.gain.setValueAtTime(SFX_VOLUME * 0.2, audioCtx.currentTime); 
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.05);
+        if (isMutedGlobal) return;
+        initAudioContext();
+        if (!audioCtx) return;
+        
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.linearRampToValueAtTime(650, now + 0.05);
+        
+        gain.gain.setValueAtTime(SFX_VOLUME * 0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+        
+        osc.start(now);
+        osc.stop(now + 0.05);
     }
 };

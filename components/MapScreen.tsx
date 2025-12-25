@@ -2,7 +2,7 @@
 import React from 'react';
 import { Player, PlayerStats } from '../types';
 import { REGIONS, AVATARS } from '../constants';
-import { Brain, Shield, Trophy, Heart, Anchor, Coins, Smile, Lock, Crown, ArrowDown } from 'lucide-react';
+import { Brain, Shield, Trophy, Heart, Anchor, Coins, Smile, Lock, Crown, ArrowDown, Check, Mars, Venus } from 'lucide-react';
 import { SoundManager } from '../utils/sound';
 
 interface MapScreenProps {
@@ -32,59 +32,60 @@ const MapScreen: React.FC<MapScreenProps> = ({
   const playerAvatarUrl = AVATARS[player.avatarId]?.url || AVATARS[0].url;
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-transparent">
+    <div className="min-h-screen flex flex-col font-sans">
       {/* Header Stats Bar */}
-      <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-indigo-50/50 sticky top-0 z-20 transition-all">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-indigo-200 shadow-sm bg-indigo-50">
-                    <img src={playerAvatarUrl} alt="Player" className="w-full h-full object-cover" />
+      <div className="glass shadow-2xl border-b border-white/5 sticky top-0 z-20 transition-all">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl overflow-hidden border border-white/20 shadow-lg bg-white/5 relative">
+                    <img src={playerAvatarUrl} alt="" className="w-full h-full object-cover" />
+                    <div className="absolute bottom-0 right-0 bg-white/20 backdrop-blur-md p-0.5 rounded-tl-lg">
+                      {player.gender === 'male' ? <Mars size={10} className="text-indigo-400" /> : <Venus size={10} className="text-rose-400" />}
+                    </div>
                 </div>
                 <div>
-                    <h3 className="font-bold text-gray-800 leading-tight text-lg">{player.name}</h3>
-                    <p className="text-xs text-indigo-500 font-semibold uppercase tracking-wider">Путник</p>
+                    <h3 className="font-black text-white leading-tight text-lg">{player.name}</h3>
+                    <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.2em]">
+                      {player.gender === 'male' ? 'Исследователь' : 'Исследовательница'} • {player.age} л.
+                    </p>
                 </div>
             </div>
 
-            <div className="flex gap-2 md:gap-4">
-                <div className="flex flex-col md:flex-row items-center gap-1 bg-yellow-50/80 px-3 py-1.5 rounded-xl border border-yellow-200 backdrop-blur-sm shadow-sm">
-                    <Smile size={18} className="text-yellow-600" />
-                    <span className="font-bold text-yellow-800 text-sm md:text-base">{stats.happiness}</span>
+            <div className="flex gap-3">
+                <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                    <Smile size={18} className="text-yellow-400" />
+                    <span className="font-bold text-white text-sm">{stats.happiness}</span>
                 </div>
-                <div className="flex flex-col md:flex-row items-center gap-1 bg-green-50/80 px-3 py-1.5 rounded-xl border border-green-200 backdrop-blur-sm shadow-sm">
-                    <Coins size={18} className="text-green-600" />
-                    <span className="font-bold text-green-800 text-sm md:text-base">{stats.income}</span>
+                <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                    <Coins size={18} className="text-emerald-400" />
+                    <span className="font-bold text-white text-sm">{stats.income}</span>
                 </div>
-                <div className="flex flex-col md:flex-row items-center gap-1 bg-purple-50/80 px-3 py-1.5 rounded-xl border border-purple-200 backdrop-blur-sm shadow-sm">
-                    <Crown size={18} className="text-purple-600" />
-                    <span className="font-bold text-purple-800 text-sm md:text-base">{stats.status}</span>
+                <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                    <Crown size={18} className="text-purple-400" />
+                    <span className="font-bold text-white text-sm">{stats.status}</span>
                 </div>
             </div>
         </div>
       </div>
 
       {/* Main Map Area */}
-      <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center relative">
-        <div className="max-w-xl w-full flex flex-col gap-8 pb-24 pt-4">
-            <div className="text-center mb-2">
-                <h2 className="text-3xl font-black text-gray-800">Жизненный Путь</h2>
-                <p className="text-gray-500 font-medium mt-1">Создайте свою историю, шаг за шагом</p>
+      <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center">
+        <div className="max-w-xl w-full flex flex-col gap-10 pb-32 pt-8">
+            <div className="text-center mb-4">
+                <h2 className="text-4xl font-black text-white mb-2">Жизненный Путь</h2>
+                <p className="text-indigo-200/50 font-medium italic">Движение сквозь пространство и время</p>
             </div>
             
             {REGIONS.map((region, index) => {
                 const isCompleted = completedRegions.includes(region.id);
-                // Linear progression logic: 
-                // A region is locked if the previous one is not completed.
-                // First region (index 0) is always unlocked.
                 const isLocked = index > 0 && !completedRegions.includes(REGIONS[index - 1].id);
                 const isNext = !isCompleted && !isLocked;
 
                 return (
-                    <div key={region.id} className="relative flex flex-col items-center group">
-                        {/* Connecting Line (except for the first one) */}
+                    <div key={region.id} className="relative flex flex-col items-center animate-in slide-in-from-bottom-10 duration-700" style={{ animationDelay: `${index * 150}ms` }}>
                         {index > 0 && (
-                            <div className={`w-1 h-12 mb-2 transition-colors duration-500 ${
-                                isLocked ? 'bg-gray-200' : isCompleted ? 'bg-green-300' : 'bg-indigo-300'
+                            <div className={`w-[2px] h-12 mb-2 transition-colors duration-1000 ${
+                                isLocked ? 'bg-white/5' : isCompleted ? 'bg-emerald-500/30' : 'bg-indigo-500/30'
                             }`}></div>
                         )}
 
@@ -100,37 +101,47 @@ const MapScreen: React.FC<MapScreenProps> = ({
                                 if (!isLocked && !isCompleted) SoundManager.playHover();
                             }}
                             className={`
-                                relative w-full flex items-center p-5 rounded-2xl border-b-4 transition-all duration-300
+                                relative w-full flex items-center p-6 rounded-[2rem] transition-all duration-500
                                 ${isCompleted 
-                                    ? 'bg-white/90 border-green-200 opacity-90' 
+                                    ? 'glass opacity-40 grayscale-0 border-emerald-500/20' 
                                     : isLocked
-                                        ? 'bg-gray-100/80 border-gray-200 opacity-70 cursor-not-allowed grayscale'
-                                        : 'bg-white border-indigo-200 shadow-xl hover:-translate-y-1 hover:shadow-2xl hover:border-indigo-400 cursor-pointer ring-4 ring-indigo-50/50'
+                                        ? 'bg-white/5 opacity-20 cursor-not-allowed grayscale'
+                                        : 'glass glass-hover shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:-translate-y-2 cursor-pointer border-white/10'
                                 }
                             `}
                         >
                             <div className={`
-                                w-16 h-16 rounded-xl flex items-center justify-center shrink-0 mr-5 transition-transform duration-300
-                                ${isCompleted ? 'bg-green-100 text-green-600 scale-90' : isLocked ? 'bg-gray-200 text-gray-400' : `${region.color} text-white shadow-lg group-hover:scale-110`}
+                                w-20 h-20 rounded-2xl flex items-center justify-center shrink-0 mr-6 transition-all duration-700
+                                ${isCompleted 
+                                    ? 'bg-emerald-500/20 text-emerald-400' 
+                                    : isLocked 
+                                        ? 'bg-white/5 text-white/20' 
+                                        : `${region.color} text-white shadow-[0_0_30px_rgba(0,0,0,0.2)] group-hover:scale-110`
+                                }
                             `}>
-                                {isLocked ? <Lock size={24} /> : <IconComponent name={region.iconName} size={32} />}
+                                {isLocked ? <Lock size={24} /> : <IconComponent name={region.iconName} size={36} />}
+                                {isCompleted && (
+                                    <div className="absolute -top-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-full shadow-lg border-2 border-[#020617]">
+                                        <Check size={12} strokeWidth={4} />
+                                    </div>
+                                )}
                             </div>
                             
                             <div className="text-left flex-1">
-                                <h3 className={`text-xl font-bold ${isCompleted ? 'text-green-800' : 'text-gray-800'}`}>
+                                <h3 className={`text-2xl font-black mb-1 ${isCompleted ? 'text-emerald-300' : 'text-white'}`}>
                                     {region.name}
                                 </h3>
-                                <p className="text-xs text-gray-500 font-bold uppercase tracking-wide mb-1">
-                                    {isCompleted ? 'Пройдено' : isLocked ? 'Недоступно' : 'Текущий этап'}
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-50">
+                                    {isCompleted ? 'Завершено' : isLocked ? 'Заблокировано' : 'Доступно'}
                                 </p>
-                                <p className="text-sm text-gray-600 leading-snug">
+                                <p className="text-sm text-indigo-100/60 leading-relaxed font-medium">
                                     {region.description}
                                 </p>
                             </div>
 
                             {isNext && (
-                                <div className="absolute -right-3 top-1/2 -translate-y-1/2 bg-indigo-600 text-white p-2.5 rounded-full animate-bounce shadow-lg ring-4 ring-white">
-                                    <ArrowDown size={18} className="-rotate-90" />
+                                <div className="absolute -right-2 top-1/2 -translate-y-1/2 bg-indigo-500 text-white p-3 rounded-full animate-bounce shadow-[0_0_20px_rgba(99,102,241,0.5)]">
+                                    <ArrowDown size={20} className="-rotate-90" />
                                 </div>
                             )}
                         </button>
@@ -141,7 +152,7 @@ const MapScreen: React.FC<MapScreenProps> = ({
       </div>
 
       {/* Footer Action */}
-      <div className="p-6 bg-white/80 backdrop-blur-md border-t border-gray-200 flex justify-center sticky bottom-0 z-20 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)]">
+      <div className="p-8 glass border-t border-white/5 flex justify-center sticky bottom-0 z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
           <button
             onClick={() => {
                 SoundManager.playClick();
@@ -149,15 +160,15 @@ const MapScreen: React.FC<MapScreenProps> = ({
             }}
             disabled={!allRegionsCompleted}
             className={`
-                w-full max-w-md px-8 py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2
+                w-full max-w-md px-10 py-5 rounded-2xl font-black text-xl transition-all flex items-center justify-center gap-3
                 ${allRegionsCompleted 
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl shadow-purple-200 hover:scale-[1.02]' 
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_30px_rgba(124,58,237,0.3)] hover:scale-105 active:scale-95' 
+                    : 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'
                 }
             `}
           >
-             {allRegionsCompleted ? 'Сформировать Личность' : `Пройдено этапов: ${completedRegions.length} / 5`}
-             {allRegionsCompleted && <Trophy size={20} />}
+             {allRegionsCompleted ? 'Сформировать Сущность' : `${completedRegions.length} / 5 Этапов`}
+             {allRegionsCompleted && <Trophy size={22} />}
           </button>
       </div>
     </div>

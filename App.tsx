@@ -24,43 +24,27 @@ function App() {
   const [completedRegions, setCompletedRegions] = useState<string[]>([]);
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
-  
-  // Analytics state
   const [startTime, setStartTime] = useState<number>(0);
   const [gameHistory, setGameHistory] = useState<Record<string, string[]>>({});
-
-  // Intro state - Default to true to show intro on every reload
   const [showIntro, setShowIntro] = useState<boolean>(true);
 
-  // Track initial page load and setup global audio listener
   useEffect(() => {
-    trackEvent('app_loaded');
-    SoundManager.init();
-
-    // 1. Пытаемся запустить музыку СРАЗУ (работает, если браузер разрешает или пользователь перезагрузил страницу)
-    if (!isMuted) {
-        SoundManager.playMusic();
-    }
-
-    // 2. Fallback: Если браузер заблокировал автозапуск, музыка начнет играть при ПЕРВОМ клике/нажатии
-    const startAudio = () => {
-      // Проверяем глобальный стейт через SoundManager, т.к. замыкание useEffect хранит старое значение
+    const handleGlobalClick = () => {
       if (!isMuted) {
-          SoundManager.playMusic();
+        SoundManager.resumeAndPlay();
       }
-      // Убираем слушатели после первой попытки взаимодействия
-      window.removeEventListener('click', startAudio);
-      window.removeEventListener('keydown', startAudio);
     };
-
-    window.addEventListener('click', startAudio);
-    window.addEventListener('keydown', startAudio);
+    document.addEventListener('mousedown', handleGlobalClick);
+    document.addEventListener('keydown', handleGlobalClick);
+    
+    SoundManager.init();
+    trackEvent('app_loaded');
 
     return () => {
-      window.removeEventListener('click', startAudio);
-      window.removeEventListener('keydown', startAudio);
+      document.removeEventListener('mousedown', handleGlobalClick);
+      document.removeEventListener('keydown', handleGlobalClick);
     };
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, [isMuted]);
 
   const handleToggleSound = (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -70,88 +54,91 @@ function App() {
   };
 
   const handleIntroComplete = () => {
-    // localStorage.setItem('hm_intro_seen', 'true'); // Removed persistence so intro shows every time
     setShowIntro(false);
-    // Ensure music continues or starts if it wasn't playing
-    if (!isMuted) SoundManager.playMusic();
+    SoundManager.resumeAndPlay(); 
   };
 
   const startCharacterCreation = () => {
     setStartTime(Date.now());
     trackEvent('flow_start_click');
+    SoundManager.playClick();
+    SoundManager.resumeAndPlay();
     setScreen('character');
   };
 
   const handleCharacterComplete = (newPlayer: Player) => {
     trackEvent('character_created', { 
-      name: newPlayer.name, 
-      avatarId: newPlayer.avatarId 
+      PlayerID: newPlayer.name,
+      Age: newPlayer.age,
+      Gender: newPlayer.gender 
     });
+    SoundManager.playClick();
+    SoundManager.resumeAndPlay();
     setPlayer(newPlayer);
     setScreen('map');
   };
 
   const handleRegionSelect = (regionId: string) => {
-    trackEvent('region_started', { regionId });
+    trackEvent('region_started', { 
+      regionId,
+      PlayerID: player?.name 
+    });
+    SoundManager.playClick();
+    SoundManager.resumeAndPlay();
     setActiveRegion(regionId);
     setScreen('region');
   };
 
   const handleRegionComplete = (rewards: ArtifactReward[], choices: { question: string, answer: string }[]) => {
-    // 1. Update Stats
     setStats((prev) => {
       const next = { ...prev };
-      rewards.forEach((r) => {
-        next[r.type] += r.amount;
-      });
+      rewards.forEach((r) => { next[r.type] += r.amount; });
       return next;
     });
 
-    // 2. Save Answers for Final Report
-    // We just extract the answer text
     const answerTexts = choices.map(c => c.answer);
     if (activeRegion) {
-       setGameHistory(prev => ({
-         ...prev,
-         [activeRegion]: answerTexts
-       }));
+       setGameHistory(prev => ({ ...prev, [activeRegion]: answerTexts }));
        setCompletedRegions((prev) => [...prev, activeRegion]);
+       trackEvent('region_completed_internal', {
+         regionId: activeRegion,
+         PlayerID: player?.name,
+         choices: answerTexts
+       });
     }
-
     setActiveRegion(null);
     setScreen('map');
   };
 
   const handleGameFinish = () => {
     if (!player) return;
-
-    // Calculate duration
     const durationSeconds = Math.floor((Date.now() - startTime) / 1000);
     const personality = determinePersonality(stats);
 
-    // Helper to safely get answer
-    const getAns = (regionId: string, idx: number) => gameHistory[regionId]?.[idx] || 'N/A';
-
-    // Construct the specific payload for Google Sheets columns
-    const sheetPayload = {
+    // Маппинг ответов для плоской структуры таблицы
+    const h = gameHistory;
+    const finalReport = {
         PlayerID: player.name,
-        // Family
-        A1_Family: getAns('family', 0),
-        A2_Family: getAns('family', 1),
-        // Education
-        A1_Edu: getAns('education', 0),
-        A2_Edu: getAns('education', 1),
-        // Economy (Work)
-        A1_Work: getAns('economy', 0),
-        A2_Work: getAns('economy', 1),
-        // State
-        A1_State: getAns('state', 0),
-        A2_State: getAns('state', 1),
-        // Culture
-        A1_Culture: getAns('culture', 0),
-        A2_Culture: getAns('culture', 1),
+        Age: player.age,
+        Gender: player.gender,
         
-        // Totals
+        // Ответы по институтам
+        A1_Family: h['family']?.[0] || '',
+        A2_Family: h['family']?.[1] || '',
+        
+        A1_Edu: h['education']?.[0] || '',
+        A2_Edu: h['education']?.[1] || '',
+        
+        A1_Work: h['economy']?.[0] || '',
+        A2_Work: h['economy']?.[1] || '',
+        
+        A1_State: h['state']?.[0] || '',
+        A2_State: h['state']?.[1] || '',
+        
+        A1_Culture: h['culture']?.[0] || '',
+        A2_Culture: h['culture']?.[1] || '',
+
+        // Итоговые статы
         Total_Happiness: stats.happiness,
         Total_Money: stats.income,
         Total_Status: stats.status,
@@ -160,72 +147,63 @@ function App() {
         TimeSpent: `${durationSeconds}s`
     };
 
-    trackEvent('game_complete_sheet', sheetPayload);
+    // Отправляем всё одним большим событием для записи в Google Sheets
+    trackEvent('game_complete_sheet', finalReport);
+    
     setScreen('results');
   };
 
   const restartGame = () => {
-    trackEvent('game_restarted');
+    trackEvent('game_restarted', { PlayerID: player?.name });
     setStats(INITIAL_STATS);
     setCompletedRegions([]);
     setActiveRegion(null);
     setGameHistory({});
     setStartTime(Date.now());
+    SoundManager.playClick();
+    SoundManager.resumeAndPlay();
     setScreen('character');
-    setShowIntro(false); // Don't show video on restart, just title screen
+    setShowIntro(false);
   };
 
   if (showIntro) {
     return <IntroVideo onComplete={handleIntroComplete} />;
   }
 
-  // Header Controls (Sound ONLY)
   const HeaderControls = (
       <button 
         onClick={handleToggleSound}
         className="fixed top-4 right-4 z-50 p-3 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-gray-800 transition-all shadow-lg ring-1 ring-white/30"
-        title={isMuted ? "Включить звук" : "Выключить звук"}
       >
-          {isMuted ? <VolumeX size={24} className="text-gray-800" /> : <Volume2 size={24} className="text-gray-800" />}
+          {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
       </button>
   );
 
-  // Intro Screen content
   if (screen === 'intro') {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden">
         {HeaderControls}
-        {/* Background blobs */}
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-indigo-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse"></div>
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-emerald-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse delay-75"></div>
 
         <div className="relative z-10 text-center max-w-2xl mx-auto">
           <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl p-8 rounded-[2rem] inline-block mb-10 border border-white/10 shadow-2xl ring-1 ring-white/20">
-            <Compass size={80} className="text-indigo-300 mx-auto drop-shadow-lg" />
+            <Compass size={80} className="text-indigo-300 mx-auto" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-tight">
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-6">
             Путь <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-emerald-300">Человека</span>
           </h1>
-          <div className="space-y-4 mb-12">
-            <p className="text-xl text-gray-300 leading-relaxed font-light">
-              Симуляция жизненных этапов.
-            </p>
-            <p className="text-lg text-gray-400">
-               Пройдите 5 институтов общества: от Семьи до Культуры. <br/>
-               Ваши решения сформируют вашу личность.
-            </p>
-          </div>
+          <p className="text-xl text-gray-300 mb-12 text-balance leading-relaxed">
+            Симуляция жизненных этапов.<br/>
+            Пройдите 5 институтов общества: от Семьи до Культуры.<br/>
+            Ваши решения сформируют вашу личность.
+          </p>
           
           <button
-            onClick={() => {
-              SoundManager.playClick();
-              // SoundManager.playMusic() is redundant here if the global listener works, but we keep it safe.
-              startCharacterCreation();
-            }}
-            className="group relative inline-flex items-center justify-center px-10 py-5 bg-white text-slate-900 rounded-2xl font-bold text-xl transition-all hover:scale-105 shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]"
+            onClick={startCharacterCreation}
+            className="group relative inline-flex items-center justify-center px-10 py-5 bg-white text-slate-900 rounded-2xl font-bold text-xl transition-all hover:scale-105 shadow-xl"
           >
-            <span className="relative z-10">Начать свой путь</span>
-            <div className="absolute inset-0 rounded-2xl bg-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity" />
+            Начать свой путь
           </button>
         </div>
       </div>
@@ -235,9 +213,7 @@ function App() {
   return (
     <>
       {HeaderControls}
-      
       {screen === 'character' && <CharacterCreation onComplete={handleCharacterComplete} />}
-      
       {screen === 'map' && player && (
         <MapScreen
           player={player}
@@ -247,7 +223,6 @@ function App() {
           onFinishGame={handleGameFinish}
         />
       )}
-
       {screen === 'region' && activeRegion && (
         <RegionScreen
           regionId={activeRegion}
@@ -255,7 +230,6 @@ function App() {
           onBack={() => setScreen('map')}
         />
       )}
-
       {screen === 'results' && player && (
         <ResultsScreen
           player={player}

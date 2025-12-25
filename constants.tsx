@@ -6,35 +6,30 @@ export const AVATARS = [
   { 
     id: 0, 
     name: '', 
-    // Changed skinColor to 8d5524 (darker brown)
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Judy&backgroundColor=b6e3f4&eyebrows=variant02&skinColor=8d5524',
     category: 'Служба'
   },
   { 
     id: 1, 
     name: '', 
-    // KEPT PINK: pink hair, pink skin, pink background
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Lola&backgroundColor=fbcfe8&hairColor=db2777&skinColor=fce7f3',
     category: 'Бизнес'
   },
   { 
     id: 2, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Bogo&backgroundColor=37474f&skinColor=fce5d3',
     category: 'Служба'
   },
   { 
     id: 3, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Lionheart&backgroundColor=fff3e0&hairColor=fbc02d&skinColor=fce5d3',
     category: 'Политика'
   },
   { 
     id: 4, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Bellwether&backgroundColor=e0f7fa&glasses=variant02&skinColor=fce5d3',
     category: 'Офис'
   },
@@ -43,35 +38,30 @@ export const AVATARS = [
   { 
     id: 5, 
     name: '', 
-    // Changed skinColor to 8d5524 (darker brown)
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Gazelle&backgroundColor=fce4ec&hairColor=fdd835&skinColor=8d5524',
     category: 'Творчество'
   },
   { 
     id: 6, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Benjamin&backgroundColor=fff9c4&skinColor=fce5d3',
     category: 'Служба'
   },
   { 
     id: 7, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Yax&backgroundColor=e8f5e9&hairColor=8d6e63&skinColor=fce5d3',
     category: 'Общество'
   },
   { 
     id: 8, 
     name: '', 
-    // Changed seed to 'Robert' to ensure visibility + Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Robert&backgroundColor=d7ccc8&skinColor=fce5d3',
     category: 'Офис'
   },
   { 
     id: 9, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Godfather&backgroundColor=263238&skinColor=fce5d3',
     category: 'Бизнес'
   },
@@ -80,35 +70,30 @@ export const AVATARS = [
   { 
     id: 10, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Bonnie&backgroundColor=f3e5f5&skinColor=fce5d3',
     category: 'Семья'
   },
   { 
     id: 11, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Finnick&backgroundColor=ffe0b2&skinColor=fce5d3',
     category: 'Улица'
   },
   { 
     id: 12, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Gideon&backgroundColor=dcedc8&skinColor=fce5d3',
     category: 'Сервис'
   },
   { 
     id: 13, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Duke&backgroundColor=cfd8dc&skinColor=fce5d3',
     category: 'Бизнес'
   },
   { 
     id: 14, 
     name: '', 
-    // Light skin enforced
     url: 'https://api.dicebear.com/9.x/adventurer/svg?seed=DrMadge&backgroundColor=e3f2fd&glasses=variant04&skinColor=fce5d3',
     category: 'Наука'
   },
@@ -136,16 +121,16 @@ export const REGIONS: Region[] = [
               { type: 'income', amount: 0 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Тёплая семейная среда усиливает эмоциональную стабильность и формирует позитивные ценности. Статус слегка растёт, так как эмпатичных людей уважают.',
+            reason: 'Эмоционально поддерживающая среда формирует чувство безопасности и внутреннего благополучия. Уважение со стороны окружающих растёт, но ориентация на материальный успех выражена слабо.',
           },
           {
             text: 'Главное — быть успешным и самостоятельным',
             rewards: [
               { type: 'happiness', amount: 0 },
               { type: 'income', amount: 2 },
-              { type: 'status', amount: 2 },
+              { type: 'status', amount: 1 },
             ],
-            reason: 'Такое воспитание делает человека более амбициозным и ориентированным на достижения, но может снижать эмоциональный комфорт.',
+            reason: 'Фокус на достижениях формирует стремление к финансовой независимости и признанию, однако эмоциональная поддержка отходит на второй план.',
           },
         ],
       },
@@ -168,10 +153,10 @@ export const REGIONS: Region[] = [
             text: 'Жёстко, через правила и дисциплину',
             rewards: [
               { type: 'happiness', amount: 0 },
-              { type: 'income', amount: 0 },
+              { type: 'income', amount: 1 },
               { type: 'status', amount: 2 },
             ],
-            reason: 'Дисциплинарный стиль делает личность сильной, решительной и статусной, но не повышает уровень счастья.',
+            reason: 'Строгая система формирует ответственность и авторитет, что усиливает статус и практическую устойчивость, но не способствует эмоциональному комфорту.',
           },
         ],
       },
@@ -215,25 +200,25 @@ export const REGIONS: Region[] = [
         npcName: 'Одноклассник-лидер',
         npcDescription: 'Всегда знает, где самые крутые перспективы.',
         imageUrl: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=800&q=80',
-        dialogue: 'Как ты выбираешь профиль после 9 класса?',
+        dialogue: 'Как ты выбираешь профиль после 9-го класса?',
         answers: [
           {
-            text: 'Беру то, что мне нравится (творчество, языки)',
+            text: 'Что нравится',
             rewards: [
               { type: 'happiness', amount: 2 },
               { type: 'income', amount: 0 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Выбор по интересам усиливает удовлетворённость жизнью и формирует уверенность в себе.',
+            reason: 'Выбор по интересам усиливает удовлетворённость и формирует уверенность в себе.',
           },
           {
-            text: 'То, что перспективно (IT, медицина)',
+            text: 'Что перспективно',
             rewards: [
               { type: 'happiness', amount: 0 },
               { type: 'income', amount: 2 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Рациональный выбор увеличивает будущий доход и социальный престиж.',
+            reason: 'Рациональный выбор увеличивает будущий доход и престиж.',
           },
         ],
       },
@@ -251,7 +236,7 @@ export const REGIONS: Region[] = [
         npcName: 'HR-менеджер',
         npcDescription: 'Оценивает людей по их резюме.',
         imageUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
-        dialogue: 'Ты выбираешь первую работу… Что важнее?',
+        dialogue: 'При выборе первой работы что важнее?',
         answers: [
           {
             text: 'Опыт и развитие',
@@ -269,7 +254,7 @@ export const REGIONS: Region[] = [
               { type: 'income', amount: 2 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Важно для финансовой стабильности, но не обязательно добавляет глубокого счастья.',
+            reason: 'Важно для финансовой стабильности, но не добавляет удовольствия или счастья.',
           },
         ],
       },
@@ -310,19 +295,19 @@ export const REGIONS: Region[] = [
     bgGradient: 'from-slate-500 to-slate-700',
     questions: [
       {
-        npcName: 'Сотрудник службы',
+        npcName: 'Сотрудник административной службы',
         npcDescription: 'Следит за порядком и правилами.',
         imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
         dialogue: 'Как участвуешь в жизни общества?',
         answers: [
           {
-            text: 'Волонтёрство, помощь людям',
+            text: 'Волонтёрство',
             rewards: [
               { type: 'happiness', amount: 2 },
               { type: 'income', amount: 0 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Помощь людям усиливает чувство смысла жизни и вызывает уважение.',
+            reason: 'Помощь людям усиливает чувство смысла и уважение.',
           },
           {
             text: 'Следую нормам (документы, налоги)',
@@ -331,7 +316,7 @@ export const REGIONS: Region[] = [
               { type: 'income', amount: 1 },
               { type: 'status', amount: 2 },
             ],
-            reason: 'Законопослушность повышает статус и обеспечивает финансовую стабильность (отсутствие штрафов).',
+            reason: 'Законопослушность повышает статус и финансовую стабильность.',
           },
         ],
       },
@@ -348,16 +333,16 @@ export const REGIONS: Region[] = [
               { type: 'income', amount: 2 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Финансовая подушка повышает устойчивость к кризисам и даёт уверенность.',
+            reason: 'Финансовая подушка повышает устойчивость и даёт уверенность.',
           },
           {
-            text: 'Поддержка друзей и связи',
+            text: 'Поддержка друзей',
             rewards: [
               { type: 'happiness', amount: 2 },
               { type: 'income', amount: 0 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Социальные связи — сильный фактор психологической стабильности и счастья.',
+            reason: 'Социальные связи — сильный фактор стабильности и счастья.',
           },
         ],
       },
@@ -384,7 +369,7 @@ export const REGIONS: Region[] = [
               { type: 'income', amount: 0 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Фокус на гармонии и близких отношениях приносит долгосрочное эмоциональное благополучие.',
+            reason: 'Фокус на гармонии приносит эмоциональное благополучие.',
           },
           {
             text: 'Успешным и влиятельным',
@@ -393,7 +378,7 @@ export const REGIONS: Region[] = [
               { type: 'income', amount: 1 },
               { type: 'status', amount: 2 },
             ],
-            reason: 'Амбиции усиливают социальный статус и открывают новые финансовые перспективы.',
+            reason: 'Амбиции усиливают статус и финансовые перспективы.',
           },
         ],
       },
@@ -410,7 +395,7 @@ export const REGIONS: Region[] = [
               { type: 'income', amount: 0 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Верность своим принципам повышает самоуважение и устойчивое счастье.',
+            reason: 'Ценностные выборы повышают устойчивое счастье.',
           },
           {
             text: 'Анализирую выгоды',
@@ -419,7 +404,7 @@ export const REGIONS: Region[] = [
               { type: 'income', amount: 2 },
               { type: 'status', amount: 1 },
             ],
-            reason: 'Рациональность и расчет увеличивают эффективность, доход и профессиональный престиж.',
+            reason: 'Рациональность увеличивает доход и престиж.',
           },
         ],
       },

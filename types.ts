@@ -17,17 +17,17 @@ export interface Question {
   npcDescription: string;
   imageUrl: string; // Specific image for the character
   dialogue: string;
-  answers: Answer[]; // Changed from [Answer, Answer] to allow flexibility and prevent type errors
+  answers: Answer[]; 
 }
 
 export interface Region {
   id: string;
   name: string;
-  iconName: string; // Used to map to Lucide icons
+  iconName: string; 
   description: string;
   questions: Question[];
   color: string;
-  bgGradient: string; // For the intro screen
+  bgGradient: string; 
 }
 
 export interface PlayerStats {
@@ -39,6 +39,8 @@ export interface PlayerStats {
 export interface Player {
   name: string;
   avatarId: number;
+  gender: 'male' | 'female';
+  age: number;
 }
 
 export type GameScreen = 'intro' | 'character' | 'map' | 'region' | 'results';
